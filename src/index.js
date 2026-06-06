@@ -87,7 +87,7 @@ const showGameData = () => {
     scoreElement.textContent = gameData.score;
     levelElement.textContent = gameData.level;
     highElement.textContent = gameData.high;
-    livesElement.textContent = "❤".repeat(player.lives);
+    livesElement.textContent = "🐒".repeat(player.lives);
 
     const pct = player.specialCharge;
     specialBarFill.style.width = pct + "%";
