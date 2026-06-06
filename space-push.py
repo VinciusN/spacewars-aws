@@ -1,14 +1,17 @@
 import boto3
 
-dynamodb = boto3.resource('dynamodb')
+dynamodb = boto3.resource(
+    'dynamodb',
+    region_name='sa-east-1'
+)
 
 table = dynamodb.Table('rank')
 
 table.put_item(
     Item={
         "id": "JOGADOR001",
-        "score": 5020,
-        "timestamp": "30 de maio de 2026 às 12:52:44 UTC-3"
+        "score": 5000,
+        "timestamp": "2026-05-30"
     }
 )
 
