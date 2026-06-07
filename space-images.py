@@ -3,9 +3,7 @@ import boto3
 s3 = boto3.client('s3')
 
 s3.upload_file(
-    'imagem.png',
+    'spaceship.png',
     'spacewars-assets',
-    'imagem.png'
+    'spaceship.png'
 )
-
-print("Upload realizado")

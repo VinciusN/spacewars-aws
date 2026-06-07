@@ -1,4 +1,4 @@
-export const PATH_SPACESHIP_IMAGE = "src/assets/images/spaceship.png";
+export const PATH_SPACESHIP_IMAGE = "https://spacewars-assets.s3.amazonaws.com/spaceship.png";
 export const PATH_INVADER_IMG = "src/assets/images/invader.png";
 export const PATH_OBSTACLE_IMAGE = "src/assets/images/obstacle.png";
 export const PATH_LOGO_IMAGE = "src/assets/images/logo.png";

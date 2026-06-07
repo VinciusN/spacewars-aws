@@ -1,6 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc, query, where, orderBy, limit, getDocs, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+const ip_publico = '56.125.189.156';
+
 const firebaseConfig = JSON.parse(atob("ew0KICAgICJhcGlLZXkiOiAiQUl6YVN5RGdGeTk1eFlKZ2tHMVdlQlN1a0M0eGF0UUwzaDBheEQ0IiwNCiAgICAiYXV0aERvbWFpbiI6ICJzcGFjZS13YXJzLTYxZDI2LmZpcmViYXNlYXBwLmNvbSIsDQogICAgInByb2plY3RJZCI6ICJzcGFjZS13YXJzLTYxZDI2IiwNCiAgICAic3RvcmFnZUJ1Y2tldCI6ICJzcGFjZS13YXJzLTYxZDI2LmZpcmViYXNlc3RvcmFnZS5hcHAiLA0KICAgICJtZXNzYWdpbmdTZW5kZXJJZCI6ICI2MzI5ODE0NzI3ODUiLA0KICAgICJhcHBJZCI6ICIxOjYzMjk4MTQ3Mjc4NTp3ZWI6MzA1ZWRiZjU5YjZhN2IzYzlmNTNiMCINCn0="));
 
 const app = initializeApp(firebaseConfig);
@@ -29,70 +31,50 @@ function getPeriodStart(period) {
     return start;
 }
 
-export async function saveScore(nickname, score) {
-    if (!nickname || score <= 0) return;
+export async function saveScore(
+    nickname,
+    score
+) {
 
-    try {
-        await addDoc(collection(db, COLLECTION), {
-            nickname,
-            score,
-            timestamp: serverTimestamp(),
-        });
+    await fetch(
+        `http://${ip_publico}:5000/save-score`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                nickname,
+                score
+            })
+        }
+    );
 
-    } catch (error) {
-        console.error("Erro ao salvar score: ", error);
-    }
+    return true;
 }
 
-export async function isNicknameTaken(nickname) {
-    try {
-        const q = query(
-            collection(db, COLLECTION),
-            where("nickname", "==", nickname),
-            limit(1)
-        );
-        const snapshot = await getDocs(q);
-        return !snapshot.empty;
+export async function isNicknameTaken(
+    nickname
+) {
 
-    } catch (error) {
-        console.error("Erro ao verificar nickname: ", error);
-        return false;
-    }
-}
-
-export async function getTopScores(period) {
-    const startDate = getPeriodStart(period);
-    const startTimestamp = Timestamp.fromDate(startDate);
-
-    try {
-        const q = query(
-            collection(db, COLLECTION),
-            where("timestamp", ">=", startTimestamp),
-            orderBy("timestamp", "desc"),
-            limit(200)
+    const response =
+        await fetch(
+            `http://${ip_publico}:5000/nickname/${nickname}`
         );
 
-        const snapshot = await getDocs(q);
+    const data =
+        await response.json();
 
-        const bestByNickname = {};
-        snapshot.docs.forEach((doc) => {
-            const data = doc.data();
-            const existing = bestByNickname[data.nickname];
-
-            if (!existing || data.score > existing.score) {
-                bestByNickname[data.nickname] = {
-                    nickname: data.nickname,
-                    score: data.score,
-                };
-            }
-        });
-
-        return Object.values(bestByNickname)
-            .sort((a, b) => b.score - a.score)
-            .slice(0, 10);
-
-    } catch (error) {
-        console.error("Erro ao buscar scores: ", error);
-        return [];
-    }
+    return data.exists;
 }
+
+export async function getTopScores() {
+
+    const response =
+        await fetch(
+            `http://${ip_publico}:5000/ranking`
+        );
+
+    return await response.json();
+}
+
